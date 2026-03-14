@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG 碳排放計算器 | 企業永續管理</title>
+    <meta name="description" content="快速計算企業範疇一、二、三碳排放量，自動產出 ESG 簡易報告與視覺化圖表。">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-leaf"></i> ESG Calculator
+        </div>
+        <button id="theme-toggle" class="theme-toggle" aria-label="切換深色/淺色模式">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+    </nav>
+
+    <main class="container">
+        <header class="page-header">
+            <h1>企業碳排放計算器</h1>
+            <p>快速計算與視覺化您的企業溫室氣體排放量 (依據 GHG Protocol)</p>
+        </header>
+
+        <div class="app-grid">
+            <!-- Left Column: Inputs -->
+            <section class="input-section glass-panel">
+                <form id="calculator-form">
+                    <!-- Step 1: Company Info -->
+                    <div class="form-group-section">
+                        <h2><i class="fa-solid fa-building"></i> 基本資訊</h2>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="company-name">公司名稱</label>
+                                <input type="text" id="company-name" required placeholder="輸入公司名稱">
+                            </div>
+                            <div class="input-group">
+                                <label for="industry">所屬產業</label>
+                                <select id="industry">
+                                    <option value="科技業">科技業</option>
+                                    <option value="製造業">製造業</option>
+                                    <option value="服務業">服務業</option>
+                                    <option value="金融業">金融業</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="employees">員工人數</label>
+                                <input type="number" id="employees" min="1" required placeholder="例如: 100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Scope 1 -->
+                    <div class="form-group-section">
+                        <h2><i class="fa-solid fa-fire-burner"></i> 範疇一 (直接排放)</h2>
+                        <p class="section-desc">公司擁有或控制的排放源 (如：公務車用油、工廠燃料)</p>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="scope1-fuel">汽柴油消耗 (公升/年)</label>
+                                <input type="number" id="scope1-fuel" min="0" value="0" step="0.1">
+                                <small class="calc-hint">預估係數: 2.36 kgCO2e/L</small>
+                            </div>
+                            <div class="input-group">
+                                <label for="scope1-gas">天然氣消耗 (度/年)</label>
+                                <input type="number" id="scope1-gas" min="0" value="0" step="0.1">
+                                <small class="calc-hint">預估係數: 1.88 kgCO2e/度</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Scope 2 -->
+                    <div class="form-group-section">
+                        <h2><i class="fa-solid fa-plug"></i> 範疇二 (間接排放)</h2>
+                        <p class="section-desc">外購電力、熱或蒸汽之能源利用</p>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="scope2-elec">外購電力 (度/年)</label>
+                                <input type="number" id="scope2-elec" min="0" value="0" step="0.1">
+                                <small class="calc-hint">預估係數: 0.495 kgCO2e/度 (依最新台電公告)</small>
+                            </div>
+                            <div class="input-group">
+                                <label for="scope2-water">用水量 (度/年)</label>
+                                <input type="number" id="scope2-water" min="0" value="0" step="0.1">
+                                <small class="calc-hint">預估係數: 0.15 kgCO2e/度</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Scope 3 -->
+                    <div class="form-group-section">
+                        <h2><i class="fa-solid fa-plane"></i> 範疇三 (其他間接排放)</h2>
+                        <p class="section-desc">價值鏈中產生的其他排放 (如：員工通勤、商務旅行)</p>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="scope3-flight">商務航班 (公里/年)</label>
+                                <input type="number" id="scope3-flight" min="0" value="0" step="0.1">
+                                <small class="calc-hint">預估係數: 0.09 kgCO2e/km</small>
+                            </div>
+                            <div class="input-group">
+                                <label for="scope3-commute">員工通勤 (公里/年)</label>
+                                <input type="number" id="scope3-commute" min="0" value="0" step="0.1">
+                                <small class="calc-hint">預估係數: 0.04 kgCO2e/km (混合交通)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-calculator"></i> 計算總碳排與產出報告
+                    </button>
+                    <button type="button" id="fill-demo" class="btn-secondary">
+                        自動填入測試數據
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Column: Results & Report -->
+            <section class="result-section">
+                <!-- Empty State -->
+                <div id="empty-state" class="glass-panel text-center active">
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <h3>尚未有計算結果</h3>
+                    <p>請於左側輸入各項數據並點擊計算，以產出您的 ESG 報告。</p>
+                </div>
+
+                <!-- Results View (Hidden initially) -->
+                <div id="results-view" class="glass-panel hidden">
+                    <div class="report-header">
+                        <h2><i class="fa-solid fa-file-invoice"></i> ESG 碳排放評估報告</h2>
+                        <p id="report-date" class="report-date"></p>
+                    </div>
+
+                    <div class="company-summary">
+                        <div class="summary-item">
+                            <span class="label">企業名稱</span>
+                            <span class="value" id="res-company">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">產業別</span>
+                            <span class="value" id="res-industry">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">員工人數</span>
+                            <span class="value" id="res-employees">-</span>
+                        </div>
+                    </div>
+
+                    <div class="total-emission-card">
+                        <h3>年度總碳排放量</h3>
+                        <div class="total-value">
+                            <span id="res-total" class="number">0</span>
+                            <span class="unit">噸 CO₂e</span>
+                        </div>
+                        <div class="per-capita">
+                            人均碳排: <span id="res-per-capita">0</span> 噸 CO₂e/人
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="emissionChart"></canvas>
+                    </div>
+
+                    <div class="scope-breakdown">
+                        <div class="scope-card scope1">
+                            <div class="scope-title">
+                                <i class="fa-solid fa-fire-burner"></i> 範疇一
+                            </div>
+                            <div class="scope-val"><span id="res-scope1">0</span> <small>噸</small></div>
+                        </div>
+                        <div class="scope-card scope2">
+                            <div class="scope-title">
+                                <i class="fa-solid fa-plug"></i> 範疇二
+                            </div>
+                            <div class="scope-val"><span id="res-scope2">0</span> <small>噸</small></div>
+                        </div>
+                        <div class="scope-card scope3">
+                            <div class="scope-title">
+                                <i class="fa-solid fa-plane"></i> 範疇三
+                            </div>
+                            <div class="scope-val"><span id="res-scope3">0</span> <small>噸</small></div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="print-report" class="btn-primary outline">
+                            <i class="fa-solid fa-print"></i> 列印 / 儲存 PDF
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
